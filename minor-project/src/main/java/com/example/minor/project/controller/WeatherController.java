@@ -26,7 +26,7 @@ public class WeatherController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
     // GET /by-hour?date=2026-01-24&hour=15
-    @GetMapping("/by-hour")
+    @GetMapping("/history")
     public List<WeatherDataResponse> getWeatherByHour(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam int hour
