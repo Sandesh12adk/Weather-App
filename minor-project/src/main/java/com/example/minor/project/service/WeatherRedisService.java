@@ -27,6 +27,7 @@ public class WeatherRedisService {
     private WeatherDataRedisToRequestWeatherData weatherDataRedisToRequestWeatherData;
     public void save(RequestWeatherData requestWeatherData){
     weatherDataRedisRepo.save(requestToWeatherDataRedis.map(requestWeatherData));
+    System.out.println("Data has saved to redis"+ requestWeatherData.toString());
     }
     @Scheduled(cron = "0 0 * * * *")
     public void saveToDataBaseFromRedis(){
