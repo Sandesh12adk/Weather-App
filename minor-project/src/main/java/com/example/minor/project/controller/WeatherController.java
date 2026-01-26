@@ -5,15 +5,19 @@ import com.example.minor.project.dto.WeatherDataResponse;
 import com.example.minor.project.model.WeatherData;
 import com.example.minor.project.service.WeatherRedisService;
 import com.example.minor.project.service.WeatherService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 @RestController
 public class WeatherController {
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
     private final WeatherRedisService weatherRedisService;
     private final WeatherService weatherService;
     public WeatherController(WeatherRedisService weatherRedisService, WeatherService weatherService){
@@ -23,6 +27,7 @@ public class WeatherController {
     @PostMapping("/weather-data")
     public ResponseEntity<?> setData(@RequestBody RequestWeatherData requestWeatherData){
       weatherRedisService.save(requestWeatherData);
+        messagingTemplate.convertAndSend("/topic",requestWeatherData);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
     // GET /by-hour?date=2026-01-24&hour=15
