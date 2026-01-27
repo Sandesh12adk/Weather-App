@@ -944,11 +944,10 @@
                 <div class="date-picker-container">
                     <input type="date" id="historyDate" class="date-picker" value="2026-01-27">
                     <button class="btn btn-custom" onclick="loadHistoryData()">
-                        <i class="fas fa-search me-2"></i>Load Data
+                        <i class="fas fa-search me-2"></i>Search
                     </button>
                 </div>
             </div>
-            <p class="date-time">Browse historical weather data by date</p>
         </div>
 
         <div class="loading-spinner" id="historyLoading">
@@ -1128,7 +1127,6 @@
         </div>
     </div>
 </div>
-
 <script>
     // WebSocket configuration
     let stompClient = null;
@@ -1145,6 +1143,20 @@
         pressure: 'line',
         uv: 'line'
     };
+
+    // Add this function to fetch current weather data on page load
+    async function fetchCurrentWeatherOnLoad() {
+        try {
+            const response = await fetch('http://localhost:8080/get-current');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            updateCurrentWeather(data);
+        } catch (error) {
+            console.error('Error fetching current weather on load:', error);
+        }
+    }
 
     // Navigation between views
     document.querySelectorAll('.nav-item').forEach(item => {
@@ -1980,29 +1992,30 @@
         document.getElementById('currentDateTime').textContent = now.toLocaleDateString('en-US', options);
     }
 
-    // Initialize on page load
+    // Initialize on page load - SINGLE DOMContentLoaded event listener
     document.addEventListener('DOMContentLoaded', function() {
         updateDateTime();
         setInterval(updateDateTime, 1000);
 
+        // Call the endpoint on page load
+        fetchCurrentWeatherOnLoad();
+
         // Auto-connect to WebSocket
         connectWebSocket();
 
-        // Initialize history date to today
-        const today = new Date();
-        const formattedDate = today.toISOString().split('T')[0];
+        // Initialize history date
         const historyDateInput = document.getElementById('historyDate');
         if (historyDateInput) {
             // Set to 2026-01-27 as default since that's where most data is
             historyDateInput.value = '2026-01-27';
         }
-    });
 
-    // Initialize Bootstrap dropdown
-    const locationDropdown = document.getElementById('locationDropdown');
-    if (locationDropdown) {
-        new bootstrap.Dropdown(locationDropdown);
-    }
+        // Initialize Bootstrap dropdown
+        const locationDropdown = document.getElementById('locationDropdown');
+        if (locationDropdown) {
+            new bootstrap.Dropdown(locationDropdown);
+        }
+    });
 </script>
 </body>
 </html>

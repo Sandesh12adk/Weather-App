@@ -11,7 +11,8 @@ import java.time.LocalTime;
 public class RequestToWeatherDataRedis {
     public WeatherDataRedis map(RequestWeatherData requestWeatherData) {
         WeatherDataRedis weatherDataRedis = new WeatherDataRedis();
-        weatherDataRedis.setId(LocalTime.now().toString());
+       // weatherDataRedis.setId(LocalTime.now().toString());
+        weatherDataRedis.setId(String.valueOf(System.currentTimeMillis()));
         weatherDataRedis.setUv(requestWeatherData.getUv());
         weatherDataRedis.setRain(requestWeatherData.isRain());
         weatherDataRedis.setHumidity(requestWeatherData.getHumidity());

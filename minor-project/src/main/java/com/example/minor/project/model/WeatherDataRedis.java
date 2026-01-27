@@ -9,7 +9,6 @@ import org.springframework.data.redis.core.RedisHash;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 @Data
 @RedisHash("weatherdataredis")
 public class WeatherDataRedis {
@@ -20,5 +19,5 @@ public class WeatherDataRedis {
     private double pressure;
     private double uv;
     private boolean isRain;
-
 }
+

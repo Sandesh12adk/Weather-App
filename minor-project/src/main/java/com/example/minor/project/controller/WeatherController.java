@@ -45,4 +45,8 @@ public class WeatherController {
                                              @RequestParam(required = false,defaultValue = "5") int pageSize){
         return ResponseEntity.ok(weatherService.findAll(pageNo,pageSize));
     }
+    @GetMapping("/get-current")
+    public ResponseEntity<RequestWeatherData> getCurrent(){
+        return ResponseEntity.ok(weatherRedisService.getCurrentData());
+    }
 }

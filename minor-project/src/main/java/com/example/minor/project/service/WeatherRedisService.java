@@ -11,7 +11,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 @Service
 public class WeatherRedisService {
@@ -56,5 +58,18 @@ public class WeatherRedisService {
         weatherDataRedis1.setRain(rainCount>size/4);
         weatherService.save(weatherDataRedisToRequestWeatherData.map(weatherDataRedis1));
         weatherDataRedisRepo.deleteAll();
+    }
+    public RequestWeatherData getCurrentData() {
+
+        return StreamSupport.stream(
+                        weatherDataRedisRepo.findAll().spliterator(), false
+                )
+                .max(Comparator.comparingLong(
+                        data -> Long.parseLong(data.getId())
+                ))
+                .map((weatherDateRedis)->{
+                   return weatherDataRedisToRequestWeatherData.map(weatherDateRedis);
+                })
+                .orElse(null);
     }
 }
