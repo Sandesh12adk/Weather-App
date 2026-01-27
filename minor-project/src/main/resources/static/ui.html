@@ -191,6 +191,174 @@
             font-weight: 500;
         }
 
+        /* Analytics Section Styles */
+        .analytics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .analytics-controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .analytics-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: rgba(17, 24, 39, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .summary-unit {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-left: 2px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-container {
+            background: rgba(17, 24, 39, 0.8);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chart-subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .daily-data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .daily-data-card {
+            background: rgba(17, 24, 39, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .daily-date {
+            color: #3b82f6;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .daily-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .daily-metric {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .daily-metric-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .daily-metric-value {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #3b82f6;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* History Section Specific Styles */
         .history-header {
             display: flex;
@@ -324,27 +492,6 @@
             color: white;
         }
 
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            padding: 40px;
-        }
-
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 3px solid #3b82f6;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         .no-data-message {
             text-align: center;
             color: rgba(255, 255, 255, 0.6);
@@ -371,26 +518,6 @@
             color: white;
         }
 
-        .summary-label {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .summary-value {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .summary-unit {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-            margin-left: 2px;
-        }
-
-        /* Existing styles remain unchanged below... */
         .connection-status {
             position: fixed;
             top: 20px;
@@ -694,6 +821,23 @@
                 flex-direction: column;
                 gap: 15px;
             }
+
+            .analytics-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .analytics-controls {
+                width: 100%;
+            }
+
+            .daily-data-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -710,8 +854,8 @@
         <p>Real-time Analytics</p>
     </div>
     <div class="nav-item active" data-view="dashboard">
-        <i class="fas fa-home"></i>
-        <span>Dashboard</span>
+        <i class="fas fa-broadcast-tower"></i>
+        <span>Live</span>
     </div>
     <div class="nav-item" data-view="history">
         <i class="fas fa-history"></i>
@@ -848,14 +992,138 @@
     <!-- Analytics View -->
     <div class="view-section" id="analyticsView">
         <div class="header">
-            <h1>Weather Analytics</h1>
-            <p class="date-time">Coming Soon - Advanced analytics and charts</p>
+            <div class="analytics-header">
+                <div>
+                    <h1>Weather Analytics</h1>
+                    <div class="date-time" id="analyticsDateRange">Last 7 Days</div>
+                </div>
+                <div class="analytics-controls">
+                    <select id="periodSelect" class="date-picker" onchange="loadAnalyticsData()">
+                        <option value="7">Last 7 Days</option>
+                        <option value="14">Last 14 Days</option>
+                        <option value="30">Last 30 Days</option>
+                    </select>
+                    <button class="btn btn-custom" onclick="loadAnalyticsData()">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                    </button>
+                </div>
+            </div>
         </div>
-        <div style="text-align: center; padding: 60px; color: white;">
-            <i class="fas fa-chart-bar" style="font-size: 72px; color: #3b82f6; margin-bottom: 20px;"></i>
-            <h3>Analytics Dashboard Under Development</h3>
-            <p style="color: rgba(255, 255, 255, 0.6); margin-top: 10px;">
-                Advanced analytics and visualization features will be available soon
+
+        <div class="loading-spinner" id="analyticsLoading">
+            <div class="spinner"></div>
+            <div style="color: white; font-size: 14px;">Loading analytics data...</div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="analytics-summary" id="analyticsSummary" style="display: none;">
+            <div class="summary-card">
+                <div class="summary-label">Avg Temperature</div>
+                <div class="summary-value" id="overallAvgTemp">0</div><span class="summary-unit">°C</span>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Avg Humidity</div>
+                <div class="summary-value" id="overallAvgHumidity">0</div><span class="summary-unit">%</span>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Avg Pressure</div>
+                <div class="summary-value" id="overallAvgPressure">0</div><span class="summary-unit">hPa</span>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Avg UV Index</div>
+                <div class="summary-value" id="overallAvgUV">0</div><span class="summary-unit">UV</span>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Rainy Days</div>
+                <div class="summary-value" id="rainyDaysCount">0</div><span class="summary-unit">days</span>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Total Records</div>
+                <div class="summary-value" id="totalRecordsCount">0</div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid" id="chartsGrid" style="display: none;">
+            <!-- Temperature Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Temperature Trend</div>
+                        <div class="chart-subtitle">Daily average temperature over time</div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-custom btn-sm" onclick="toggleChartType('temperature')">
+                            <i class="fas fa-exchange-alt me-2"></i>Toggle View
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="temperatureChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Humidity Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Humidity Trend</div>
+                        <div class="chart-subtitle">Daily average humidity over time</div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-custom btn-sm" onclick="toggleChartType('humidity')">
+                            <i class="fas fa-exchange-alt me-2"></i>Toggle View
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="humidityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Pressure Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Pressure Trend</div>
+                        <div class="chart-subtitle">Daily average pressure over time</div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-custom btn-sm" onclick="toggleChartType('pressure')">
+                            <i class="fas fa-exchange-alt me-2"></i>Toggle View
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="pressureChart"></canvas>
+                </div>
+            </div>
+
+            <!-- UV Index Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">UV Index Trend</div>
+                        <div class="chart-subtitle">Daily average UV index over time</div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-custom btn-sm" onclick="toggleChartType('uv')">
+                            <i class="fas fa-exchange-alt me-2"></i>Toggle View
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="uvChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="no-data-message" id="analyticsNoDataMessage" style="display: none;">
+            <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 20px; color: #3b82f6;"></i>
+            <h4 style="color: white; margin-bottom: 10px;">No Data Available</h4>
+            <p>No weather data found for the selected period.</p>
+            <p class="mt-2" style="font-size: 12px; color: rgba(255, 255, 255, 0.4);">
+                Try selecting a different time period
             </p>
         </div>
     </div>
@@ -866,6 +1134,17 @@
     let stompClient = null;
     let isConnected = false;
     let currentHistoryData = [];
+    let dailyAverages = [];
+    let temperatureChart = null;
+    let humidityChart = null;
+    let pressureChart = null;
+    let uvChart = null;
+    let currentChartTypes = {
+        temperature: 'line',
+        humidity: 'line',
+        pressure: 'line',
+        uv: 'line'
+    };
 
     // Navigation between views
     document.querySelectorAll('.nav-item').forEach(item => {
@@ -890,6 +1169,10 @@
             // If history view is selected, load data
             if (viewId === 'historyView') {
                 loadHistoryData();
+            }
+            // If analytics view is selected, load analytics data
+            if (viewId === 'analyticsView') {
+                loadAnalyticsData();
             }
         });
     });
@@ -1114,6 +1397,572 @@
         document.getElementById('noDataMessage').style.display = 'block';
         document.getElementById('hourlyCardsContainer').innerHTML = '';
         document.getElementById('dataSummary').style.display = 'none';
+    }
+
+    // Analytics data functions
+    async function loadAnalyticsData() {
+        const periodSelect = document.getElementById('periodSelect');
+        const days = parseInt(periodSelect.value);
+
+        console.log(`Loading analytics data for last ${days} days`);
+
+        // Show loading spinner
+        document.getElementById('analyticsLoading').style.display = 'block';
+        document.getElementById('analyticsSummary').style.display = 'none';
+        document.getElementById('chartsGrid').style.display = 'none';
+        document.getElementById('analyticsNoDataMessage').style.display = 'none';
+
+        try {
+            // Calculate date range
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(endDate.getDate() - days + 1);
+
+            // Format dates for display
+            const startDateStr = startDate.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            const endDateStr = endDate.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+
+            document.getElementById('analyticsDateRange').textContent =
+                `${startDateStr} - ${endDateStr}`;
+
+            // Fetch data for each day
+            dailyAverages = [];
+            let allData = [];
+            let totalRecords = 0;
+
+            // Create array of dates to fetch
+            const datesToFetch = [];
+            const currentDate = new Date(startDate);
+
+            while (currentDate <= endDate) {
+                const dateStr = currentDate.toISOString().split('T')[0];
+                datesToFetch.push(dateStr);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            // Fetch data for all dates
+            const fetchPromises = datesToFetch.map(date =>
+                fetch(`http://localhost:8080/history?date=${date}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        console.warn(`No data for ${date}:`, error.message);
+                        return [];
+                    })
+            );
+
+            const allResults = await Promise.all(fetchPromises);
+
+            // Process data for each day
+            datesToFetch.forEach((dateStr, index) => {
+                const dayData = allResults[index];
+
+                if (dayData && dayData.length > 0) {
+                    // Calculate daily averages
+                    const dailyAvg = calculateDailyAverage(dayData, dateStr);
+                    dailyAverages.push(dailyAvg);
+                    allData = allData.concat(dayData);
+                    totalRecords += dayData.length;
+                }
+            });
+
+            // Sort daily averages by date
+            dailyAverages.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if (dailyAverages.length === 0) {
+                document.getElementById('analyticsNoDataMessage').style.display = 'block';
+                return;
+            }
+
+            // Update summary statistics
+            updateAnalyticsSummary(allData, dailyAverages, totalRecords);
+
+            // Create all charts
+            createTemperatureChart();
+            createHumidityChart();
+            createPressureChart();
+            createUVChart();
+
+            // Show all components
+            document.getElementById('analyticsSummary').style.display = 'grid';
+            document.getElementById('chartsGrid').style.display = 'grid';
+
+        } catch (error) {
+            console.error('Error loading analytics data:', error);
+            document.getElementById('analyticsNoDataMessage').style.display = 'block';
+        } finally {
+            document.getElementById('analyticsLoading').style.display = 'none';
+        }
+    }
+
+    function calculateDailyAverage(dayData, dateStr) {
+        const count = dayData.length;
+
+        // Calculate averages
+        const avgTemp = dayData.reduce((sum, item) => sum + item.temp, 0) / count;
+        const avgHumidity = dayData.reduce((sum, item) => sum + item.humidity, 0) / count;
+        const avgPressure = dayData.reduce((sum, item) => sum + item.pressure, 0) / count;
+        const avgUV = dayData.reduce((sum, item) => sum + item.uv, 0) / count;
+
+        // Get min and max values for all metrics
+        const minTemp = Math.min(...dayData.map(item => item.temp));
+        const maxTemp = Math.max(...dayData.map(item => item.temp));
+        const minHumidity = Math.min(...dayData.map(item => item.humidity));
+        const maxHumidity = Math.max(...dayData.map(item => item.humidity));
+        const minPressure = Math.min(...dayData.map(item => item.pressure));
+        const maxPressure = Math.max(...dayData.map(item => item.pressure));
+        const minUV = Math.min(...dayData.map(item => item.uv));
+        const maxUV = Math.max(...dayData.map(item => item.uv));
+
+        // Check if it rained at any point during the day
+        const rained = dayData.some(item => item.rain);
+
+        // Count rainy hours
+        const rainyHours = dayData.filter(item => item.rain).length;
+
+        return {
+            date: dateStr,
+            avgTemp: avgTemp,
+            avgHumidity: avgHumidity,
+            avgPressure: avgPressure,
+            avgUV: avgUV,
+            minTemp: minTemp,
+            maxTemp: maxTemp,
+            minHumidity: minHumidity,
+            maxHumidity: maxHumidity,
+            minPressure: minPressure,
+            maxPressure: maxPressure,
+            minUV: minUV,
+            maxUV: maxUV,
+            rained: rained,
+            rainyHours: rainyHours,
+            totalRecords: count
+        };
+    }
+
+    function updateAnalyticsSummary(allData, dailyAverages, totalRecords) {
+        // Calculate overall averages
+        const overallAvgTemp = dailyAverages.reduce((sum, day) => sum + day.avgTemp, 0) / dailyAverages.length;
+        const overallAvgHumidity = dailyAverages.reduce((sum, day) => sum + day.avgHumidity, 0) / dailyAverages.length;
+        const overallAvgPressure = dailyAverages.reduce((sum, day) => sum + day.avgPressure, 0) / dailyAverages.length;
+        const overallAvgUV = dailyAverages.reduce((sum, day) => sum + day.avgUV, 0) / dailyAverages.length;
+
+        // Count rainy days
+        const rainyDays = dailyAverages.filter(day => day.rained).length;
+
+        // Update display
+        document.getElementById('overallAvgTemp').textContent = overallAvgTemp.toFixed(1);
+        document.getElementById('overallAvgHumidity').textContent = overallAvgHumidity.toFixed(1);
+        document.getElementById('overallAvgPressure').textContent = overallAvgPressure.toFixed(1);
+        document.getElementById('overallAvgUV').textContent = overallAvgUV.toFixed(1);
+        document.getElementById('rainyDaysCount').textContent = rainyDays;
+        document.getElementById('totalRecordsCount').textContent = totalRecords;
+    }
+
+    function createTemperatureChart() {
+        const ctx = document.getElementById('temperatureChart').getContext('2d');
+
+        // Destroy existing chart if it exists
+        if (temperatureChart) {
+            temperatureChart.destroy();
+        }
+
+        const labels = dailyAverages.map(day => {
+            const date = new Date(day.date);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
+            });
+        });
+
+        temperatureChart = new Chart(ctx, {
+            type: currentChartTypes.temperature,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Average Temperature (°C)',
+                    data: dailyAverages.map(day => day.avgTemp),
+                    borderColor: '#f59e0b',
+                    backgroundColor: currentChartTypes.temperature === 'bar'
+                        ? 'rgba(245, 158, 11, 0.3)'
+                        : 'rgba(245, 158, 11, 0.1)',
+                    borderWidth: 2,
+                    fill: currentChartTypes.temperature === 'line',
+                    tension: 0.4
+                },
+                {
+                    label: 'Min Temperature (°C)',
+                    data: dailyAverages.map(day => day.minTemp),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    fill: false
+                },
+                {
+                    label: 'Max Temperature (°C)',
+                    data: dailyAverages.map(day => day.maxTemp),
+                    borderColor: '#ef4444',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: '#3b82f6',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.6)'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.6)',
+                            callback: function(value) {
+                                return value + '°C';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function createHumidityChart() {
+        const ctx = document.getElementById('humidityChart').getContext('2d');
+
+        // Destroy existing chart if it exists
+        if (humidityChart) {
+            humidityChart.destroy();
+        }
+
+        const labels = dailyAverages.map(day => {
+            const date = new Date(day.date);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
+            });
+        });
+
+        humidityChart = new Chart(ctx, {
+            type: currentChartTypes.humidity,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Average Humidity (%)',
+                    data: dailyAverages.map(day => day.avgHumidity),
+                    borderColor: '#06b6d4',
+                    backgroundColor: currentChartTypes.humidity === 'bar'
+                        ? 'rgba(6, 182, 212, 0.3)'
+                        : 'rgba(6, 182, 212, 0.1)',
+                    borderWidth: 2,
+                    fill: currentChartTypes.humidity === 'line',
+                    tension: 0.4
+                },
+                {
+                    label: 'Min Humidity (%)',
+                    data: dailyAverages.map(day => day.minHumidity),
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    fill: false
+                },
+                {
+                    label: 'Max Humidity (%)',
+                    data: dailyAverages.map(day => day.maxHumidity),
+                    borderColor: '#ec4899',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: '#3b82f6',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.6)'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.6)',
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function createPressureChart() {
+        const ctx = document.getElementById('pressureChart').getContext('2d');
+
+        // Destroy existing chart if it exists
+        if (pressureChart) {
+            pressureChart.destroy();
+        }
+
+        const labels = dailyAverages.map(day => {
+            const date = new Date(day.date);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
+            });
+        });
+
+        pressureChart = new Chart(ctx, {
+            type: currentChartTypes.pressure,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Average Pressure (hPa)',
+                    data: dailyAverages.map(day => day.avgPressure),
+                    borderColor: '#10b981',
+                    backgroundColor: currentChartTypes.pressure === 'bar'
+                        ? 'rgba(16, 185, 129, 0.3)'
+                        : 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 2,
+                    fill: currentChartTypes.pressure === 'line',
+                    tension: 0.4
+                },
+                {
+                    label: 'Min Pressure (hPa)',
+                    data: dailyAverages.map(day => day.minPressure),
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    fill: false
+                },
+                {
+                    label: 'Max Pressure (hPa)',
+                    data: dailyAverages.map(day => day.maxPressure),
+                    borderColor: '#ec4899',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: '#3b82f6',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.6)'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.6)',
+                            callback: function(value) {
+                                return value + ' hPa';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function createUVChart() {
+        const ctx = document.getElementById('uvChart').getContext('2d');
+
+        // Destroy existing chart if it exists
+        if (uvChart) {
+            uvChart.destroy();
+        }
+
+        const labels = dailyAverages.map(day => {
+            const date = new Date(day.date);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
+            });
+        });
+
+        uvChart = new Chart(ctx, {
+            type: currentChartTypes.uv,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Average UV Index',
+                    data: dailyAverages.map(day => day.avgUV),
+                    borderColor: '#ec4899',
+                    backgroundColor: currentChartTypes.uv === 'bar'
+                        ? 'rgba(236, 72, 153, 0.3)'
+                        : 'rgba(236, 72, 153, 0.1)',
+                    borderWidth: 2,
+                    fill: currentChartTypes.uv === 'line',
+                    tension: 0.4
+                },
+                {
+                    label: 'Min UV Index',
+                    data: dailyAverages.map(day => day.minUV),
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    fill: false
+                },
+                {
+                    label: 'Max UV Index',
+                    data: dailyAverages.map(day => day.maxUV),
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: '#3b82f6',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.6)'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.6)',
+                            callback: function(value) {
+                                return value.toFixed(1);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function toggleChartType(chartName) {
+        currentChartTypes[chartName] = currentChartTypes[chartName] === 'line' ? 'bar' : 'line';
+
+        if (chartName === 'temperature') {
+            createTemperatureChart();
+        } else if (chartName === 'humidity') {
+            createHumidityChart();
+        } else if (chartName === 'pressure') {
+            createPressureChart();
+        } else if (chartName === 'uv') {
+            createUVChart();
+        }
     }
 
     // Update date and time
