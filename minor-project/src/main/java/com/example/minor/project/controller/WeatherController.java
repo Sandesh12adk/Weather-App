@@ -32,10 +32,17 @@ public class WeatherController {
     }
     // GET /by-hour?date=2026-01-24&hour=15
     @GetMapping("/history")
-    public List<WeatherDataResponse> getWeatherByHour(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam int hour
+    public ResponseEntity<List<WeatherDataResponse>> getWeatherByDate(
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate date
     ) {
-        return weatherService.getWeatherByDateAndHour(date, hour);
+        return ResponseEntity.ok(weatherService.getWeatherByDate(date));
+    }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<List<WeatherDataResponse>> findAll(@RequestParam(required = false,defaultValue ="1") int pageNo,
+                                             @RequestParam(required = false,defaultValue = "5") int pageSize){
+        return ResponseEntity.ok(weatherService.findAll(pageNo,pageSize));
     }
 }

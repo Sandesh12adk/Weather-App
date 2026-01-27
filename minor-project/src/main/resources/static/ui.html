@@ -9,6 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -190,6 +191,206 @@
             font-weight: 500;
         }
 
+        /* History Section Specific Styles */
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .date-picker-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .date-picker {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            min-width: 200px;
+            backdrop-filter: blur(10px);
+        }
+
+        .date-picker:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .hourly-cards-container {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            overflow-x: auto;
+            margin-bottom: 30px;
+            scrollbar-width: thin;
+            scrollbar-color: #3b82f6 rgba(255, 255, 255, 0.1);
+            min-height: 300px;
+        }
+
+        .hourly-cards-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .hourly-cards-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .hourly-cards-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 10px;
+        }
+
+        .hourly-card {
+            flex: 0 0 auto;
+            width: 200px;
+            background: rgba(17, 24, 39, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .hourly-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .hour-time {
+            color: #3b82f6;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .hour-date {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .hour-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hour-metric:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .metric-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+
+        .metric-value {
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .rain-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .rain-yes {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        .rain-no {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #3b82f6;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-data-message {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 40px;
+            font-size: 16px;
+            background: rgba(17, 24, 39, 0.8);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .data-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(17, 24, 39, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .summary-item {
+            text-align: center;
+            color: white;
+        }
+
+        .summary-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .summary-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .summary-unit {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-left: 2px;
+        }
+
+        /* Existing styles remain unchanged below... */
         .connection-status {
             position: fixed;
             top: 20px;
@@ -474,6 +675,25 @@
                 font-size: 12px;
                 padding: 8px 16px;
             }
+
+            .hourly-card {
+                width: 180px;
+                padding: 20px;
+            }
+
+            .history-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .date-picker-container {
+                width: 100%;
+            }
+
+            .data-summary {
+                flex-direction: column;
+                gap: 15px;
+            }
         }
     </style>
 </head>
@@ -572,13 +792,107 @@
         </div>
     </div>
 
-    <!-- History and Analytics sections would go here -->
+    <!-- History View -->
+    <div class="view-section" id="historyView">
+        <div class="header">
+            <div class="history-header">
+                <h1>Weather History</h1>
+                <div class="date-picker-container">
+                    <input type="date" id="historyDate" class="date-picker" value="2026-01-27">
+                    <button class="btn btn-custom" onclick="loadHistoryData()">
+                        <i class="fas fa-search me-2"></i>Load Data
+                    </button>
+                </div>
+            </div>
+            <p class="date-time">Browse historical weather data by date</p>
+        </div>
+
+        <div class="loading-spinner" id="historyLoading">
+            <div class="spinner"></div>
+            <div style="color: white; font-size: 14px;">Loading historical data...</div>
+        </div>
+
+        <div class="data-summary" id="dataSummary" style="display: none;">
+            <div class="summary-item">
+                <div class="summary-label">Records Found</div>
+                <div class="summary-value" id="recordsCount">0</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Avg Temp</div>
+                <div class="summary-value" id="avgTemp">0</div><span class="summary-unit">°C</span>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Avg Humidity</div>
+                <div class="summary-value" id="avgHumidity">0</div><span class="summary-unit">%</span>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Avg Pressure</div>
+                <div class="summary-value" id="avgPressure">0</div><span class="summary-unit">hPa</span>
+            </div>
+        </div>
+
+        <div class="hourly-cards-container" id="hourlyCardsContainer">
+            <!-- Hourly cards will be populated here -->
+        </div>
+
+        <div class="no-data-message" id="noDataMessage" style="display: none;">
+            <i class="fas fa-cloud-meatball" style="font-size: 48px; margin-bottom: 20px; color: #3b82f6;"></i>
+            <h4 style="color: white; margin-bottom: 10px;">No Data Available</h4>
+            <p>No weather data found for the selected date.</p>
+            <p class="mt-2" style="font-size: 12px; color: rgba(255, 255, 255, 0.4);">
+                Try selecting a different date
+            </p>
+        </div>
+    </div>
+
+    <!-- Analytics View -->
+    <div class="view-section" id="analyticsView">
+        <div class="header">
+            <h1>Weather Analytics</h1>
+            <p class="date-time">Coming Soon - Advanced analytics and charts</p>
+        </div>
+        <div style="text-align: center; padding: 60px; color: white;">
+            <i class="fas fa-chart-bar" style="font-size: 72px; color: #3b82f6; margin-bottom: 20px;"></i>
+            <h3>Analytics Dashboard Under Development</h3>
+            <p style="color: rgba(255, 255, 255, 0.6); margin-top: 10px;">
+                Advanced analytics and visualization features will be available soon
+            </p>
+        </div>
+    </div>
 </div>
 
 <script>
     // WebSocket configuration
     let stompClient = null;
     let isConnected = false;
+    let currentHistoryData = [];
+
+    // Navigation between views
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function() {
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                nav.classList.remove('active');
+            });
+
+            // Add active class to clicked nav item
+            this.classList.add('active');
+
+            // Hide all view sections
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show the selected view section
+            const viewId = this.getAttribute('data-view') + 'View';
+            document.getElementById(viewId).classList.add('active');
+
+            // If history view is selected, load data
+            if (viewId === 'historyView') {
+                loadHistoryData();
+            }
+        });
+    });
 
     // WebSocket connection functions
     function connectWebSocket() {
@@ -652,6 +966,156 @@
         }
     }
 
+    // History data functions
+    async function loadHistoryData() {
+        const dateInput = document.getElementById('historyDate');
+        const selectedDate = dateInput.value;
+
+        console.log('Loading data for date:', selectedDate);
+
+        // Show loading spinner
+        document.getElementById('historyLoading').style.display = 'block';
+        document.getElementById('dataSummary').style.display = 'none';
+        document.getElementById('noDataMessage').style.display = 'none';
+        document.getElementById('hourlyCardsContainer').innerHTML = '';
+
+        try {
+            // Fetch data from API
+            const response = await fetch(`http://localhost:8080/history?date=${selectedDate}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            currentHistoryData = data;
+
+            console.log('Data received:', data);
+
+            if (data.length === 0) {
+                showNoDataMessage();
+                return;
+            }
+
+            // Sort data by time
+            data.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+
+            // Update summary
+            updateDataSummary(data);
+
+            // Create hourly cards
+            createHourlyCards(data);
+
+        } catch (error) {
+            console.error('Error loading history data:', error);
+            console.error('Error details:', error.message);
+            showNoDataMessage();
+        } finally {
+            document.getElementById('historyLoading').style.display = 'none';
+        }
+    }
+
+    function updateDataSummary(data) {
+        const count = data.length;
+
+        // Calculate averages
+        const avgTemp = data.reduce((sum, item) => sum + item.temp, 0) / count;
+        const avgHumidity = data.reduce((sum, item) => sum + item.humidity, 0) / count;
+        const avgPressure = data.reduce((sum, item) => sum + item.pressure, 0) / count;
+
+        // Update summary display
+        document.getElementById('recordsCount').textContent = count;
+        document.getElementById('avgTemp').textContent = avgTemp.toFixed(1);
+        document.getElementById('avgHumidity').textContent = avgHumidity.toFixed(1);
+        document.getElementById('avgPressure').textContent = avgPressure.toFixed(1);
+
+        // Show summary
+        document.getElementById('dataSummary').style.display = 'flex';
+    }
+
+    function createHourlyCards(data) {
+        const container = document.getElementById('hourlyCardsContainer');
+        container.innerHTML = '';
+
+        // Group data by hour for better organization
+        const hours = {};
+        data.forEach(item => {
+            const time = new Date(item.dateTime);
+            const hour = time.getHours();
+            const dateStr = time.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+
+            if (!hours[hour]) {
+                hours[hour] = {
+                    hour: hour,
+                    date: dateStr,
+                    data: []
+                };
+            }
+            hours[hour].data.push(item);
+        });
+
+        // Sort hours and create cards
+        Object.values(hours)
+            .sort((a, b) => a.hour - b.hour)
+            .forEach(hourData => {
+                // For each hour, create cards for each data point
+                hourData.data.forEach(item => {
+                    const time = new Date(item.dateTime);
+                    const formattedTime = time.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+                    const dateStr = time.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+
+                    const card = document.createElement('div');
+                    card.className = 'hourly-card';
+                    card.innerHTML = `
+                        <div class="hour-date">${dateStr}</div>
+                        <div class="hour-time">${formattedTime}</div>
+                        <div class="hour-metric">
+                            <span class="metric-label">Temperature</span>
+                            <span class="metric-value">${item.temp.toFixed(1)}°C</span>
+                        </div>
+                        <div class="hour-metric">
+                            <span class="metric-label">Humidity</span>
+                            <span class="metric-value">${item.humidity.toFixed(1)}%</span>
+                        </div>
+                        <div class="hour-metric">
+                            <span class="metric-label">Pressure</span>
+                            <span class="metric-value">${item.pressure.toFixed(1)} hPa</span>
+                        </div>
+                        <div class="hour-metric">
+                            <span class="metric-label">UV Index</span>
+                            <span class="metric-value">${item.uv.toFixed(1)}</span>
+                        </div>
+                        <div class="hour-metric">
+                            <span class="metric-label">Rain</span>
+                            <span class="rain-badge ${item.rain ? 'rain-yes' : 'rain-no'}">
+                                ${item.rain ? 'Yes' : 'No'}
+                            </span>
+                        </div>
+                    `;
+
+                    container.appendChild(card);
+                });
+            });
+    }
+
+    function showNoDataMessage() {
+        document.getElementById('noDataMessage').style.display = 'block';
+        document.getElementById('hourlyCardsContainer').innerHTML = '';
+        document.getElementById('dataSummary').style.display = 'none';
+    }
+
     // Update date and time
     function updateDateTime() {
         const now = new Date();
@@ -674,6 +1138,15 @@
 
         // Auto-connect to WebSocket
         connectWebSocket();
+
+        // Initialize history date to today
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        const historyDateInput = document.getElementById('historyDate');
+        if (historyDateInput) {
+            // Set to 2026-01-27 as default since that's where most data is
+            historyDateInput.value = '2026-01-27';
+        }
     });
 
     // Initialize Bootstrap dropdown
