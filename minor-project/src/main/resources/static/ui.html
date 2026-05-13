@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Weather Analytics</title>
+    <title>Weather Analytics Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -11,6 +11,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <style>
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #1a365d;
+            --accent-color: #00a8ff;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-color: #f8fafc;
+            --dark-color: #0f172a;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --border-radius: 12px;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --elevated-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -19,232 +42,407 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #7e22ce 50%, #ec4899 75%, #f59e0b 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            min-height: 100vh;
+            background-color: #f8fafc;
+            color: #334155;
             overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
+        /* Sidebar */
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 300px;
+            width: 260px;
             height: 100vh;
-            background: rgba(17, 24, 39, 0.98);
-            backdrop-filter: blur(20px);
-            box-shadow: 4px 0 30px rgba(0, 0, 0, 0.3);
-            padding: 30px 20px;
+            background: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+            padding: 24px 0;
             z-index: 1000;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid #e2e8f0;
         }
 
         .sidebar-header {
-            margin-bottom: 50px;
-            text-align: center;
+            padding: 0 24px 32px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 24px;
         }
 
         .sidebar-header h2 {
-            background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            letter-spacing: -1px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-header h2 i {
+            color: var(--primary-color);
+            font-size: 24px;
         }
 
         .sidebar-header p {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--gray-500);
             font-size: 13px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .nav-item {
-            padding: 18px 24px;
-            margin: 12px 0;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 600;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #06b6d4, #3b82f6);
-            opacity: 0;
-            transition: opacity 0.4s;
-            border-radius: 16px;
-        }
-
-        .nav-item:hover::before {
-            opacity: 0.15;
-        }
-
-        .nav-item:hover {
-            color: white;
-            transform: translateX(8px);
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
-            color: white;
-            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4);
-        }
-
-        .nav-item.active::before {
-            opacity: 0;
-        }
-
-        .nav-item i {
-            font-size: 22px;
-            width: 28px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .nav-item span {
-            position: relative;
-            z-index: 1;
-        }
-
-        .main-content {
-            margin-left: 300px;
-            padding: 40px;
-            min-height: 100vh;
-        }
-
-        .view-section {
-            display: none;
-        }
-
-        .view-section.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .header {
-            background: rgba(17, 24, 39, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #f59e0b);
-            background-size: 200% 100%;
-            animation: shimmer 3s linear infinite;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-
-        .header h1 {
-            color: white;
-            font-size: 42px;
-            font-weight: 800;
-            margin-bottom: 12px;
-            letter-spacing: -1px;
-        }
-
-        .header .date-time {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 16px;
+            margin-top: 4px;
             font-weight: 500;
         }
 
-        /* Analytics Section Styles */
+        .nav-item {
+            padding: 16px 24px;
+            margin: 4px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: var(--card-shadow);
+        }
+
+        .nav-item.active i {
+            color: white;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            width: 24px;
+            color: var(--gray-500);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 16px;
+            }
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid #e2e8f0;
+        }
+
+        .header h1 {
+            color: var(--dark-color);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header .date-time {
+            color: var(--gray-500);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Weather Cards */
+        .weather-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .weather-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .weather-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--elevated-shadow);
+        }
+
+        .weather-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .weather-card:nth-child(1)::before { background: linear-gradient(90deg, var(--primary-color), #4dabf7); }
+        .weather-card:nth-child(2)::before { background: linear-gradient(90deg, var(--success-color), #51cf66); }
+        .weather-card:nth-child(3)::before { background: linear-gradient(90deg, var(--warning-color), #ffa94d); }
+        .weather-card:nth-child(4)::before { background: linear-gradient(90deg, var(--accent-color), #339af0); }
+
+        .weather-card-icon {
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+
+        .weather-card:nth-child(1) .weather-card-icon { color: var(--primary-color); }
+        .weather-card:nth-child(2) .weather-card-icon { color: var(--success-color); }
+        .weather-card:nth-child(3) .weather-card-icon { color: var(--warning-color); }
+        .weather-card:nth-child(4) .weather-card-icon { color: var(--accent-color); }
+
+        .weather-card-title {
+            color: var(--gray-500);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .weather-card-value {
+            color: var(--dark-color);
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1;
+        }
+
+        .weather-card-unit {
+            color: var(--gray-500);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .rain-indicator {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        .rain-indicator.yes {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .rain-indicator.no {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        /* History Section */
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .date-picker-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .date-picker {
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: var(--gray-700);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 180px;
+            transition: all 0.2s ease;
+        }
+
+        .date-picker:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        .hourly-cards-container {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            overflow-x: auto;
+            margin-bottom: 24px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) #f1f5f9;
+        }
+
+        .hourly-cards-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .hourly-cards-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .hourly-cards-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+
+        .hourly-card {
+            flex: 0 0 auto;
+            width: 220px;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .hourly-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--elevated-shadow);
+        }
+
+        .hour-time {
+            color: var(--primary-color);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .hour-date {
+            color: var(--gray-500);
+            font-size: 12px;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .hour-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .hour-metric:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .metric-label {
+            color: var(--gray-600);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            color: var(--dark-color);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .rain-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .rain-yes {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+        }
+
+        .rain-no {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        /* Analytics Section */
         .analytics-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .analytics-controls {
             display: flex;
-            gap: 20px;
+            gap: 12px;
             align-items: center;
         }
 
         .analytics-summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
         .summary-card {
-            background: rgba(17, 24, 39, 0.8);
-            border-radius: 16px;
+            background: white;
+            border-radius: var(--border-radius);
             padding: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--card-shadow);
+            border: 1px solid #e2e8f0;
         }
 
         .summary-label {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--gray-500);
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .summary-value {
-            color: white;
+            color: var(--dark-color);
             font-size: 24px;
             font-weight: 700;
+            line-height: 1;
         }
 
         .summary-unit {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-            margin-left: 2px;
+            color: var(--gray-500);
+            margin-left: 4px;
+            font-weight: 500;
         }
 
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         @media (max-width: 1200px) {
@@ -254,12 +452,11 @@
         }
 
         .chart-container {
-            background: rgba(17, 24, 39, 0.8);
-            border-radius: 16px;
-            padding: 25px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid #e2e8f0;
         }
 
         .chart-header {
@@ -270,14 +467,14 @@
         }
 
         .chart-title {
-            color: white;
-            font-size: 18px;
+            color: var(--dark-color);
+            font-size: 16px;
             font-weight: 600;
         }
 
         .chart-subtitle {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 14px;
+            color: var(--gray-500);
+            font-size: 13px;
         }
 
         .chart-wrapper {
@@ -286,68 +483,16 @@
             width: 100%;
         }
 
-        .daily-data-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .daily-data-card {
-            background: rgba(17, 24, 39, 0.8);
-            border-radius: 16px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .daily-date {
-            color: #3b82f6;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .daily-metrics {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .daily-metric {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-        }
-
-        .daily-metric-label {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-        }
-
-        .daily-metric-value {
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
+        /* Loading and No Data States */
         .loading-spinner {
-            display: none;
             text-align: center;
-            padding: 40px;
+            padding: 60px;
         }
 
         .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(0, 102, 204, 0.1);
             border-radius: 50%;
-            border-top: 3px solid #3b82f6;
+            border-top: 3px solid var(--primary-color);
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
@@ -359,165 +504,39 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* History Section Specific Styles */
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .date-picker-container {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .date-picker {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 14px;
-            min-width: 200px;
-            backdrop-filter: blur(10px);
-        }
-
-        .date-picker:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-        }
-
-        .hourly-cards-container {
-            display: flex;
-            gap: 20px;
-            padding: 20px;
-            overflow-x: auto;
-            margin-bottom: 30px;
-            scrollbar-width: thin;
-            scrollbar-color: #3b82f6 rgba(255, 255, 255, 0.1);
-            min-height: 300px;
-        }
-
-        .hourly-cards-container::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .hourly-cards-container::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-
-        .hourly-cards-container::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border-radius: 10px;
-        }
-
-        .hourly-card {
-            flex: 0 0 auto;
-            width: 200px;
-            background: rgba(17, 24, 39, 0.95);
-            border-radius: 20px;
-            padding: 25px;
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .hourly-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .hour-time {
-            color: #3b82f6;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .hour-date {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
-            margin-bottom: 5px;
-            text-align: center;
-        }
-
-        .hour-metric {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .hour-metric:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-
-        .metric-label {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
-        }
-
-        .metric-value {
-            color: white;
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        .rain-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .rain-yes {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
-        }
-
-        .rain-no {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-        }
-
         .no-data-message {
             text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-            padding: 40px;
-            font-size: 16px;
-            background: rgba(17, 24, 39, 0.8);
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
+            color: var(--gray-500);
+            padding: 60px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
         }
 
+        .no-data-message i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--gray-300);
+        }
+
+        /* Data Summary */
         .data-summary {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(17, 24, 39, 0.8);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid #e2e8f0;
         }
 
         .summary-item {
             text-align: center;
-            color: white;
         }
 
+        /* Connection Status */
         .connection-status {
             position: fixed;
             top: 20px;
@@ -525,318 +544,171 @@
             z-index: 1001;
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 14px;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
         }
 
         .connection-status.connected {
-            background: rgba(34, 197, 94, 0.2);
-            color: #22c55e;
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
         }
 
         .connection-status.disconnected {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
         .connection-status.connecting {
-            background: rgba(245, 158, 11, 0.2);
-            color: #f59e0b;
-            border: 1px solid rgba(245, 158, 11, 0.3);
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+            border: 1px solid rgba(245, 158, 11, 0.2);
         }
 
         .status-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            animation: pulse 2s infinite;
         }
 
         .status-dot.connected {
-            background: #22c55e;
-            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            background: var(--success-color);
         }
 
         .status-dot.disconnected {
-            background: #ef4444;
+            background: var(--danger-color);
         }
 
         .status-dot.connecting {
-            background: #f59e0b;
-            animation: connectingPulse 1.5s infinite;
+            background: var(--warning-color);
+            animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        @keyframes connectingPulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        .weather-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .weather-card {
-            background: rgba(17, 24, 39, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 35px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .weather-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-        }
-
-        .weather-card:nth-child(1)::before {
-            background: linear-gradient(90deg, #f59e0b, #ef4444);
-        }
-
-        .weather-card:nth-child(2)::before {
-            background: linear-gradient(90deg, #06b6d4, #3b82f6);
-        }
-
-        .weather-card:nth-child(3)::before {
-            background: linear-gradient(90deg, #8b5cf6, #ec4899);
-        }
-
-        .weather-card:nth-child(4)::before {
-            background: linear-gradient(90deg, #10b981, #06b6d4);
-        }
-
-        .weather-card:nth-child(5)::before {
-            background: linear-gradient(90deg, #ec4899, #f59e0b);
-        }
-
-        .weather-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
-        }
-
-        .weather-card-icon {
-            font-size: 56px;
-            margin-bottom: 24px;
-            filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.4));
-        }
-
-        .weather-card:nth-child(1) .weather-card-icon {
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .weather-card:nth-child(2) .weather-card-icon {
-            background: linear-gradient(135deg, #06b6d4, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .weather-card:nth-child(3) .weather-card-icon {
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .weather-card:nth-child(4) .weather-card-icon {
-            background: linear-gradient(135deg, #10b981, #06b6d4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .weather-card:nth-child(5) .weather-card-icon {
-            background: linear-gradient(135deg, #ec4899, #f59e0b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .weather-card-title {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .weather-card-value {
-            color: white;
-            font-size: 48px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            letter-spacing: -2px;
-        }
-
-        .weather-card-unit {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .rain-indicator {
-            display: inline-block;
-            padding: 12px 28px;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 18px;
-            letter-spacing: 0.5px;
-        }
-
-        .rain-indicator.yes {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
-        }
-
-        .rain-indicator.no {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
-        }
-
+        /* Buttons */
         .btn-custom {
-            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            background: var(--primary-color);
             border: none;
             color: white;
-            padding: 14px 32px;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
-            letter-spacing: 0.5px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            cursor: pointer;
         }
 
         .btn-custom:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(59, 130, 246, 0.5);
+            background: #0052a3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
             color: white;
         }
 
-        .btn-danger-custom {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            border: none;
-            color: white;
-            padding: 14px 32px;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
-            letter-spacing: 0.5px;
+        .btn-custom:active {
+            transform: translateY(0);
         }
 
-        .btn-danger-custom:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(239, 68, 68, 0.5);
-            color: white;
+        .btn-custom i {
+            margin-right: 6px;
         }
 
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* View Sections */
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Dropdown */
         .dropdown-menu {
-            background: rgba(17, 24, 39, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 10px;
-            margin-top: 10px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px;
+            margin-top: 4px;
+            box-shadow: var(--elevated-shadow);
         }
 
         .dropdown-item {
-            color: rgba(255, 255, 255, 0.8);
-            padding: 12px 20px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            color: var(--gray-700);
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 14px;
         }
 
         .dropdown-item:hover {
-            background: rgba(59, 130, 246, 0.2);
-            color: white;
+            background-color: #f1f5f9;
+            color: var(--primary-color);
         }
 
+        .dropdown-item i {
+            margin-right: 8px;
+            color: var(--gray-500);
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-            }
-
             .weather-cards {
                 grid-template-columns: 1fr;
             }
 
-            .connection-status {
-                top: 10px;
-                right: 10px;
-                font-size: 12px;
-                padding: 8px 16px;
-            }
-
-            .hourly-card {
-                width: 180px;
-                padding: 20px;
-            }
-
             .history-header {
                 flex-direction: column;
-                gap: 20px;
+                gap: 16px;
             }
 
             .date-picker-container {
                 width: 100%;
             }
 
-            .data-summary {
-                flex-direction: column;
-                gap: 15px;
-            }
-
             .analytics-header {
                 flex-direction: column;
-                gap: 20px;
+                gap: 16px;
             }
 
             .analytics-controls {
                 width: 100%;
             }
 
-            .daily-data-grid {
-                grid-template-columns: 1fr;
+            .data-summary {
+                flex-direction: column;
+                gap: 16px;
             }
 
-            .charts-grid {
-                grid-template-columns: 1fr;
+            .hourly-card {
+                width: 200px;
+            }
+
+            .connection-status {
+                top: 10px;
+                right: 10px;
+                font-size: 12px;
+                padding: 8px 12px;
             }
         }
     </style>
@@ -850,16 +722,16 @@
 
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <h2><i class="fas fa-cloud-sun-rain"></i>Weather</h2>
-        <p>Real-time Analytics</p>
+        <h2><i class="fas fa-cloud-sun"></i>Weather Analytics</h2>
+        <p>Real-time Monitoring Dashboard</p>
     </div>
     <div class="nav-item active" data-view="dashboard">
         <i class="fas fa-broadcast-tower"></i>
-        <span>Live</span>
+        <span>Live Dashboard</span>
     </div>
     <div class="nav-item" data-view="history">
         <i class="fas fa-history"></i>
-        <span>History</span>
+        <span>Historical Data</span>
     </div>
     <div class="nav-item" data-view="analytics">
         <i class="fas fa-chart-line"></i>
@@ -871,11 +743,11 @@
     <!-- Dashboard View -->
     <div class="view-section active" id="dashboardView">
         <div class="header">
-            <h1>Live Weather Monitor</h1>
+            <h1>Live Weather Dashboard</h1>
             <div class="date-time" id="currentDateTime"></div>
             <div class="mt-3">
                 <div class="dropdown">
-                    <button class="btn btn-custom dropdown-toggle" type="button" id="locationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn-custom dropdown-toggle" type="button" id="locationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-map-marker-alt me-2"></i>Ghaarmi danda
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="locationDropdown">
@@ -890,7 +762,7 @@
         <div class="weather-cards">
             <div class="weather-card">
                 <div class="weather-card-icon">
-                    <i class="fas fa-temperature-high"></i>
+                    <i class="fas fa-thermometer-half"></i>
                 </div>
                 <div class="weather-card-title">Temperature</div>
                 <div class="weather-card-value" id="temperature">--</div>
@@ -915,22 +787,14 @@
                 <div class="weather-card-unit">hPa</div>
             </div>
 
-            <div class="weather-card">
-                <div class="weather-card-icon">
-                    <i class="fas fa-sun"></i>
-                </div>
-                <div class="weather-card-title">UV Index</div>
-                <div class="weather-card-value" id="uvIndex">--</div>
-                <div class="weather-card-unit">UV</div>
-            </div>
 
             <div class="weather-card">
                 <div class="weather-card-icon">
                     <i class="fas fa-cloud-rain"></i>
                 </div>
                 <div class="weather-card-title">Rain Status</div>
-                <div style="margin-top: 15px;">
-                    <span class="rain-indicator no" id="rainStatus">No Rain</span>
+                <div class="weather-card-value" style="font-size: 18px; margin-top: 8px;">
+                    <span class="rain-indicator no" id="rainStatus">Not Raining</span>
                 </div>
             </div>
         </div>
@@ -943,16 +807,16 @@
                 <h1>Weather History</h1>
                 <div class="date-picker-container">
                     <input type="date" id="historyDate" class="date-picker" value="2026-01-27">
-                    <button class="btn btn-custom" onclick="loadHistoryData()">
+                    <button class="btn-custom" onclick="loadHistoryData()">
                         <i class="fas fa-search me-2"></i>Search
                     </button>
                 </div>
             </div>
         </div>
 
-        <div class="loading-spinner" id="historyLoading">
+        <div class="loading-spinner" id="historyLoading" style="display: none;">
             <div class="spinner"></div>
-            <div style="color: white; font-size: 14px;">Loading historical data...</div>
+            <div style="color: var(--gray-600); font-size: 14px;">Loading historical data...</div>
         </div>
 
         <div class="data-summary" id="dataSummary" style="display: none;">
@@ -979,10 +843,10 @@
         </div>
 
         <div class="no-data-message" id="noDataMessage" style="display: none;">
-            <i class="fas fa-cloud-meatball" style="font-size: 48px; margin-bottom: 20px; color: #3b82f6;"></i>
-            <h4 style="color: white; margin-bottom: 10px;">No Data Available</h4>
+            <i class="fas fa-cloud"></i>
+            <h4 style="color: var(--dark-color); margin-bottom: 8px;">No Data Available</h4>
             <p>No weather data found for the selected date.</p>
-            <p class="mt-2" style="font-size: 12px; color: rgba(255, 255, 255, 0.4);">
+            <p class="mt-2" style="font-size: 12px; color: var(--gray-500);">
                 Try selecting a different date
             </p>
         </div>
@@ -1002,16 +866,16 @@
                         <option value="14">Last 14 Days</option>
                         <option value="30">Last 30 Days</option>
                     </select>
-                    <button class="btn btn-custom" onclick="loadAnalyticsData()">
+                    <button class="btn-custom" onclick="loadAnalyticsData()">
                         <i class="fas fa-sync-alt me-2"></i>Refresh
                     </button>
                 </div>
             </div>
         </div>
 
-        <div class="loading-spinner" id="analyticsLoading">
+        <div class="loading-spinner" id="analyticsLoading" style="display: none;">
             <div class="spinner"></div>
-            <div style="color: white; font-size: 14px;">Loading analytics data...</div>
+            <div style="color: var(--gray-600); font-size: 14px;">Loading analytics data...</div>
         </div>
 
         <!-- Summary Stats -->
@@ -1027,10 +891,6 @@
             <div class="summary-card">
                 <div class="summary-label">Avg Pressure</div>
                 <div class="summary-value" id="overallAvgPressure">0</div><span class="summary-unit">hPa</span>
-            </div>
-            <div class="summary-card">
-                <div class="summary-label">Avg UV Index</div>
-                <div class="summary-value" id="overallAvgUV">0</div><span class="summary-unit">UV</span>
             </div>
             <div class="summary-card">
                 <div class="summary-label">Rainy Days</div>
@@ -1052,7 +912,7 @@
                         <div class="chart-subtitle">Daily average temperature over time</div>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-custom btn-sm" onclick="toggleChartType('temperature')">
+                        <button class="btn-custom btn-sm" onclick="toggleChartType('temperature')">
                             <i class="fas fa-exchange-alt me-2"></i>Toggle View
                         </button>
                     </div>
@@ -1070,7 +930,7 @@
                         <div class="chart-subtitle">Daily average humidity over time</div>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-custom btn-sm" onclick="toggleChartType('humidity')">
+                        <button class="btn-custom btn-sm" onclick="toggleChartType('humidity')">
                             <i class="fas fa-exchange-alt me-2"></i>Toggle View
                         </button>
                     </div>
@@ -1088,7 +948,7 @@
                         <div class="chart-subtitle">Daily average pressure over time</div>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-custom btn-sm" onclick="toggleChartType('pressure')">
+                        <button class="btn-custom btn-sm" onclick="toggleChartType('pressure')">
                             <i class="fas fa-exchange-alt me-2"></i>Toggle View
                         </button>
                     </div>
@@ -1098,924 +958,813 @@
                 </div>
             </div>
 
-            <!-- UV Index Chart -->
-            <div class="chart-container">
-                <div class="chart-header">
-                    <div>
-                        <div class="chart-title">UV Index Trend</div>
-                        <div class="chart-subtitle">Daily average UV index over time</div>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn btn-custom btn-sm" onclick="toggleChartType('uv')">
-                            <i class="fas fa-exchange-alt me-2"></i>Toggle View
-                        </button>
-                    </div>
-                </div>
-                <div class="chart-wrapper">
-                    <canvas id="uvChart"></canvas>
-                </div>
+            <div class="no-data-message" id="analyticsNoDataMessage" style="display: none;">
+                <i class="fas fa-chart-line"></i>
+                <h4 style="color: var(--dark-color); margin-bottom: 8px;">No Data Available</h4>
+                <p>No weather data found for the selected period.</p>
+                <p class="mt-2" style="font-size: 12px; color: var(--gray-500);">
+                    Try selecting a different time period
+                </p>
             </div>
         </div>
-
-        <div class="no-data-message" id="analyticsNoDataMessage" style="display: none;">
-            <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 20px; color: #3b82f6;"></i>
-            <h4 style="color: white; margin-bottom: 10px;">No Data Available</h4>
-            <p>No weather data found for the selected period.</p>
-            <p class="mt-2" style="font-size: 12px; color: rgba(255, 255, 255, 0.4);">
-                Try selecting a different time period
-            </p>
-        </div>
     </div>
-</div>
-<script>
-    // WebSocket configuration
-    let stompClient = null;
-    let isConnected = false;
-    let currentHistoryData = [];
-    let dailyAverages = [];
-    let temperatureChart = null;
-    let humidityChart = null;
-    let pressureChart = null;
-    let uvChart = null;
-    let currentChartTypes = {
-        temperature: 'line',
-        humidity: 'line',
-        pressure: 'line',
-        uv: 'line'
-    };
+    <script>
+        // WebSocket configuration
+        let stompClient = null;
+        let isConnected = false;
+        let currentHistoryData = [];
+        let dailyAverages = [];
+        let temperatureChart = null;
+        let humidityChart = null;
+        let pressureChart = null;
+        let currentChartTypes = {
+            temperature: 'line',
+            humidity: 'line',
+            pressure: 'line'
+        };
 
-    // Add this function to fetch current weather data on page load
-    async function fetchCurrentWeatherOnLoad() {
-        try {
-            const response = await fetch('http://localhost:8080/get-current');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+        // Add this function to fetch current weather data on page load
+        async function fetchCurrentWeatherOnLoad() {
+            try {
+                const response = await fetch('http://localhost:8080/get-current');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                updateCurrentWeather(data);
+            } catch (error) {
+                console.error('Error fetching current weather on load:', error);
             }
-            const data = await response.json();
-            updateCurrentWeather(data);
-        } catch (error) {
-            console.error('Error fetching current weather on load:', error);
         }
-    }
 
-    // Navigation between views
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', function() {
-            // Remove active class from all nav items
-            document.querySelectorAll('.nav-item').forEach(nav => {
-                nav.classList.remove('active');
+        // Navigation between views
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all nav items
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+
+                // Add active class to clicked nav item
+                this.classList.add('active');
+
+                // Hide all view sections
+                document.querySelectorAll('.view-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+
+                // Show the selected view section
+                const viewId = this.getAttribute('data-view') + 'View';
+                document.getElementById(viewId).classList.add('active');
+
+                // If history view is selected, load data
+                if (viewId === 'historyView') {
+                    loadHistoryData();
+                }
+                // If analytics view is selected, load analytics data
+                if (viewId === 'analyticsView') {
+                    loadAnalyticsData();
+                }
             });
-
-            // Add active class to clicked nav item
-            this.classList.add('active');
-
-            // Hide all view sections
-            document.querySelectorAll('.view-section').forEach(section => {
-                section.classList.remove('active');
-            });
-
-            // Show the selected view section
-            const viewId = this.getAttribute('data-view') + 'View';
-            document.getElementById(viewId).classList.add('active');
-
-            // If history view is selected, load data
-            if (viewId === 'historyView') {
-                loadHistoryData();
-            }
-            // If analytics view is selected, load analytics data
-            if (viewId === 'analyticsView') {
-                loadAnalyticsData();
-            }
-        });
-    });
-
-    // WebSocket connection functions
-    function connectWebSocket() {
-        updateConnectionStatus('connecting');
-
-        const socket = new SockJS('http://localhost:8080/ws-chat');
-        stompClient = Stomp.over(socket);
-
-        stompClient.connect({}, function(frame) {
-            console.log('Connected: ' + frame);
-            isConnected = true;
-            updateConnectionStatus('connected');
-
-            // Subscribe to the topic where weather data is published
-            stompClient.subscribe('/topic', function(message) {
-                const weatherData = JSON.parse(message.body);
-                updateCurrentWeather(weatherData);
-            });
-
-        }, function(error) {
-            console.error('WebSocket connection error:', error);
-            isConnected = false;
-            updateConnectionStatus('disconnected');
-
-            // Try to reconnect after 5 seconds
-            setTimeout(connectWebSocket, 5000);
         });
 
-        // Close dropdown after selection
-        const dropdown = document.querySelector('#locationDropdown');
-        if (dropdown) {
-            bootstrap.Dropdown.getInstance(dropdown)?.hide();
+        // WebSocket connection functions
+        function connectWebSocket() {
+            updateConnectionStatus('connecting');
+
+            const socket = new SockJS('http://localhost:8080/ws-chat');
+            stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                isConnected = true;
+                updateConnectionStatus('connected');
+
+                // Subscribe to the topic where weather data is published
+                stompClient.subscribe('/topic', function(message) {
+                    const weatherData = JSON.parse(message.body);
+                    updateCurrentWeather(weatherData);
+                });
+
+            }, function(error) {
+                console.error('WebSocket connection error:', error);
+                isConnected = false;
+                updateConnectionStatus('disconnected');
+
+                // Try to reconnect after 5 seconds
+                setTimeout(connectWebSocket, 5000);
+            });
+
+            // Close dropdown after selection
+            const dropdown = document.querySelector('#locationDropdown');
+            if (dropdown) {
+                bootstrap.Dropdown.getInstance(dropdown)?.hide();
+            }
         }
-    }
 
-    function updateConnectionStatus(status) {
-        const statusElement = document.getElementById('connectionStatus');
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
+        function updateConnectionStatus(status) {
+            const statusElement = document.getElementById('connectionStatus');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
 
-        statusElement.className = `connection-status ${status}`;
-        statusDot.className = `status-dot ${status}`;
+            statusElement.className = `connection-status ${status}`;
+            statusDot.className = `status-dot ${status}`;
 
-        switch(status) {
-            case 'connected':
-                statusText.textContent = 'Connected to Ghaarmi danda';
-                break;
-            case 'disconnected':
-                statusText.textContent = 'Disconnected';
-                break;
-            case 'connecting':
-                statusText.textContent = 'Connecting to Ghaarmi danda...';
-                break;
+            switch(status) {
+                case 'connected':
+                    statusText.textContent = 'Connected to Ghaarmi danda';
+                    break;
+                case 'disconnected':
+                    statusText.textContent = 'Disconnected';
+                    break;
+                case 'connecting':
+                    statusText.textContent = 'Connecting to Ghaarmi danda...';
+                    break;
+            }
         }
-    }
 
-    // Update current weather display
-    function updateCurrentWeather(data) {
-        document.getElementById('temperature').textContent = data.temp.toFixed(1);
-        document.getElementById('humidity').textContent = data.humidity.toFixed(0);
-        document.getElementById('pressure').textContent = data.pressure.toFixed(1);
-        document.getElementById('uvIndex').textContent = data.uv.toFixed(1);
 
-        const rainEl = document.getElementById('rainStatus');
-        if (data.rain) {
-            rainEl.textContent = 'Raining';
-            rainEl.className = 'rain-indicator yes';
-        } else {
-            rainEl.textContent = 'No Rain';
-            rainEl.className = 'rain-indicator no';
-        }
-    }
-
-    // History data functions
-    async function loadHistoryData() {
-        const dateInput = document.getElementById('historyDate');
-        const selectedDate = dateInput.value;
-
-        console.log('Loading data for date:', selectedDate);
-
-        // Show loading spinner
-        document.getElementById('historyLoading').style.display = 'block';
-        document.getElementById('dataSummary').style.display = 'none';
-        document.getElementById('noDataMessage').style.display = 'none';
-        document.getElementById('hourlyCardsContainer').innerHTML = '';
-
-        try {
-            // Fetch data from API
-            const response = await fetch(`http://localhost:8080/history?date=${selectedDate}`);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+        // Helper: supports both backend formats: isRain and rain
+        // Your rain sensor logic:
+        // false / 0 = Raining
+        // true / 1  = Not Raining
+        function getRainValue(data) {
+            if (data.isRain !== undefined) {
+                return data.isRain === false;
             }
 
-            const data = await response.json();
-            currentHistoryData = data;
+            if (data.rain !== undefined) {
+                return data.rain === false;
+            }
 
-            console.log('Data received:', data);
+            return false;
+        }
 
-            if (data.length === 0) {
+        // Update current weather display
+        function updateCurrentWeather(data) {
+            document.getElementById('temperature').textContent = data.temp.toFixed(1);
+            document.getElementById('humidity').textContent = data.humidity.toFixed(0);
+            document.getElementById('pressure').textContent = data.pressure.toFixed(1);
+
+            const rainEl = document.getElementById('rainStatus');
+            if (getRainValue(data)) {
+                rainEl.textContent = 'Raining';
+                rainEl.className = 'rain-indicator yes';
+            } else {
+                rainEl.textContent = 'Not Raining';
+                rainEl.className = 'rain-indicator no';
+            }
+        }
+
+        // History data functions
+        async function loadHistoryData() {
+            const dateInput = document.getElementById('historyDate');
+            const selectedDate = dateInput.value;
+
+            console.log('Loading data for date:', selectedDate);
+
+            // Show loading spinner
+            document.getElementById('historyLoading').style.display = 'block';
+            document.getElementById('dataSummary').style.display = 'none';
+            document.getElementById('noDataMessage').style.display = 'none';
+            document.getElementById('hourlyCardsContainer').innerHTML = '';
+
+            try {
+                // Fetch data from API
+                const response = await fetch(`http://localhost:8080/history?date=${selectedDate}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                currentHistoryData = data;
+
+                console.log('Data received:', data);
+
+                if (data.length === 0) {
+                    showNoDataMessage();
+                    return;
+                }
+
+                // Sort data by time
+                data.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+
+                // Update summary
+                updateDataSummary(data);
+
+                // Create hourly cards
+                createHourlyCards(data);
+
+            } catch (error) {
+                console.error('Error loading history data:', error);
+                console.error('Error details:', error.message);
                 showNoDataMessage();
-                return;
+            } finally {
+                document.getElementById('historyLoading').style.display = 'none';
             }
-
-            // Sort data by time
-            data.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
-
-            // Update summary
-            updateDataSummary(data);
-
-            // Create hourly cards
-            createHourlyCards(data);
-
-        } catch (error) {
-            console.error('Error loading history data:', error);
-            console.error('Error details:', error.message);
-            showNoDataMessage();
-        } finally {
-            document.getElementById('historyLoading').style.display = 'none';
         }
-    }
 
-    function updateDataSummary(data) {
-        const count = data.length;
+        function updateDataSummary(data) {
+            const count = data.length;
 
-        // Calculate averages
-        const avgTemp = data.reduce((sum, item) => sum + item.temp, 0) / count;
-        const avgHumidity = data.reduce((sum, item) => sum + item.humidity, 0) / count;
-        const avgPressure = data.reduce((sum, item) => sum + item.pressure, 0) / count;
+            // Calculate averages
+            const avgTemp = data.reduce((sum, item) => sum + item.temp, 0) / count;
+            const avgHumidity = data.reduce((sum, item) => sum + item.humidity, 0) / count;
+            const avgPressure = data.reduce((sum, item) => sum + item.pressure, 0) / count;
 
-        // Update summary display
-        document.getElementById('recordsCount').textContent = count;
-        document.getElementById('avgTemp').textContent = avgTemp.toFixed(1);
-        document.getElementById('avgHumidity').textContent = avgHumidity.toFixed(1);
-        document.getElementById('avgPressure').textContent = avgPressure.toFixed(1);
+            // Update summary display
+            document.getElementById('recordsCount').textContent = count;
+            document.getElementById('avgTemp').textContent = avgTemp.toFixed(1);
+            document.getElementById('avgHumidity').textContent = avgHumidity.toFixed(1);
+            document.getElementById('avgPressure').textContent = avgPressure.toFixed(1);
 
-        // Show summary
-        document.getElementById('dataSummary').style.display = 'flex';
-    }
+            // Show summary
+            document.getElementById('dataSummary').style.display = 'flex';
+        }
 
-    function createHourlyCards(data) {
-        const container = document.getElementById('hourlyCardsContainer');
-        container.innerHTML = '';
+        function createHourlyCards(data) {
+            const container = document.getElementById('hourlyCardsContainer');
+            container.innerHTML = '';
 
-        // Group data by hour for better organization
-        const hours = {};
-        data.forEach(item => {
-            const time = new Date(item.dateTime);
-            const hour = time.getHours();
-            const dateStr = time.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
+            // Group data by hour for better organization
+            const hours = {};
+            data.forEach(item => {
+                const time = new Date(item.dateTime);
+                const hour = time.getHours();
+                const dateStr = time.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                if (!hours[hour]) {
+                    hours[hour] = {
+                        hour: hour,
+                        date: dateStr,
+                        data: []
+                    };
+                }
+                hours[hour].data.push(item);
             });
 
-            if (!hours[hour]) {
-                hours[hour] = {
-                    hour: hour,
-                    date: dateStr,
-                    data: []
-                };
+            // Sort hours and create cards
+            Object.values(hours)
+                .sort((a, b) => a.hour - b.hour)
+                .forEach(hourData => {
+                    // For each hour, create cards for each data point
+                    hourData.data.forEach(item => {
+                        const time = new Date(item.dateTime);
+                        const formattedTime = time.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                        });
+                        const dateStr = time.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                        });
+
+                        const card = document.createElement('div');
+                        card.className = 'hourly-card';
+                        card.innerHTML = `
+                            <div class="hour-date">${dateStr}</div>
+                            <div class="hour-time">${formattedTime}</div>
+                            <div class="hour-metric">
+                                <span class="metric-label">Temperature</span>
+                                <span class="metric-value">${item.temp.toFixed(1)}°C</span>
+                            </div>
+                            <div class="hour-metric">
+                                <span class="metric-label">Humidity</span>
+                                <span class="metric-value">${item.humidity.toFixed(1)}%</span>
+                            </div>
+                            <div class="hour-metric">
+                                <span class="metric-label">Pressure</span>
+                                <span class="metric-value">${item.pressure.toFixed(1)} hPa</span>
+                            </div>
+                            <div class="hour-metric">
+                                <span class="metric-label">Rain</span>
+                                <span class="rain-badge ${getRainValue(item) ? 'rain-yes' : 'rain-no'}">
+                                    ${getRainValue(item) ? 'Yes' : 'No'}
+                                </span>
+                            </div>
+                        `;
+
+                        container.appendChild(card);
+                    });
+                });
+        }
+
+        function showNoDataMessage() {
+            document.getElementById('noDataMessage').style.display = 'block';
+            document.getElementById('hourlyCardsContainer').innerHTML = '';
+            document.getElementById('dataSummary').style.display = 'none';
+        }
+
+        // Analytics data functions
+        async function loadAnalyticsData() {
+            const periodSelect = document.getElementById('periodSelect');
+            const days = parseInt(periodSelect.value);
+
+            console.log(`Loading analytics data for last ${days} days`);
+
+            // Show loading spinner
+            document.getElementById('analyticsLoading').style.display = 'block';
+            document.getElementById('analyticsSummary').style.display = 'none';
+            document.getElementById('chartsGrid').style.display = 'none';
+            document.getElementById('analyticsNoDataMessage').style.display = 'none';
+
+            try {
+                // Calculate date range
+                const endDate = new Date();
+                const startDate = new Date();
+                startDate.setDate(endDate.getDate() - days + 1);
+
+                // Format dates for display
+                const startDateStr = startDate.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                const endDateStr = endDate.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                document.getElementById('analyticsDateRange').textContent =
+                    `${startDateStr} - ${endDateStr}`;
+
+                // Fetch data for each day
+                dailyAverages = [];
+                let allData = [];
+                let totalRecords = 0;
+
+                // Create array of dates to fetch
+                const datesToFetch = [];
+                const currentDate = new Date(startDate);
+
+                while (currentDate <= endDate) {
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    datesToFetch.push(dateStr);
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                // Fetch data for all dates
+                const fetchPromises = datesToFetch.map(date =>
+                    fetch(`http://localhost:8080/history?date=${date}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .catch(error => {
+                            console.warn(`No data for ${date}:`, error.message);
+                            return [];
+                        })
+                );
+
+                const allResults = await Promise.all(fetchPromises);
+
+                // Process data for each day
+                datesToFetch.forEach((dateStr, index) => {
+                    const dayData = allResults[index];
+
+                    if (dayData && dayData.length > 0) {
+                        // Calculate daily averages
+                        const dailyAvg = calculateDailyAverage(dayData, dateStr);
+                        dailyAverages.push(dailyAvg);
+                        allData = allData.concat(dayData);
+                        totalRecords += dayData.length;
+                    }
+                });
+
+                // Sort daily averages by date
+                dailyAverages.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                if (dailyAverages.length === 0) {
+                    document.getElementById('analyticsNoDataMessage').style.display = 'block';
+                    return;
+                }
+
+                // Update summary statistics
+                updateAnalyticsSummary(allData, dailyAverages, totalRecords);
+
+                // Create all charts
+                createTemperatureChart();
+                createHumidityChart();
+                createPressureChart();
+
+                // Show all components
+                document.getElementById('analyticsSummary').style.display = 'grid';
+                document.getElementById('chartsGrid').style.display = 'grid';
+
+            } catch (error) {
+                console.error('Error loading analytics data:', error);
+                document.getElementById('analyticsNoDataMessage').style.display = 'block';
+            } finally {
+                document.getElementById('analyticsLoading').style.display = 'none';
             }
-            hours[hour].data.push(item);
-        });
+        }
 
-        // Sort hours and create cards
-        Object.values(hours)
-            .sort((a, b) => a.hour - b.hour)
-            .forEach(hourData => {
-                // For each hour, create cards for each data point
-                hourData.data.forEach(item => {
-                    const time = new Date(item.dateTime);
-                    const formattedTime = time.toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false
-                    });
-                    const dateStr = time.toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric'
-                    });
+        function calculateDailyAverage(dayData, dateStr) {
+            const count = dayData.length;
 
-                    const card = document.createElement('div');
-                    card.className = 'hourly-card';
-                    card.innerHTML = `
-                        <div class="hour-date">${dateStr}</div>
-                        <div class="hour-time">${formattedTime}</div>
-                        <div class="hour-metric">
-                            <span class="metric-label">Temperature</span>
-                            <span class="metric-value">${item.temp.toFixed(1)}°C</span>
-                        </div>
-                        <div class="hour-metric">
-                            <span class="metric-label">Humidity</span>
-                            <span class="metric-value">${item.humidity.toFixed(1)}%</span>
-                        </div>
-                        <div class="hour-metric">
-                            <span class="metric-label">Pressure</span>
-                            <span class="metric-value">${item.pressure.toFixed(1)} hPa</span>
-                        </div>
-                        <div class="hour-metric">
-                            <span class="metric-label">UV Index</span>
-                            <span class="metric-value">${item.uv.toFixed(1)}</span>
-                        </div>
-                        <div class="hour-metric">
-                            <span class="metric-label">Rain</span>
-                            <span class="rain-badge ${item.rain ? 'rain-yes' : 'rain-no'}">
-                                ${item.rain ? 'Yes' : 'No'}
-                            </span>
-                        </div>
-                    `;
+            // Calculate averages
+            const avgTemp = dayData.reduce((sum, item) => sum + item.temp, 0) / count;
+            const avgHumidity = dayData.reduce((sum, item) => sum + item.humidity, 0) / count;
+            const avgPressure = dayData.reduce((sum, item) => sum + item.pressure, 0) / count;
 
-                    container.appendChild(card);
+            // Get min and max values for all metrics
+            const minTemp = Math.min(...dayData.map(item => item.temp));
+            const maxTemp = Math.max(...dayData.map(item => item.temp));
+            const minHumidity = Math.min(...dayData.map(item => item.humidity));
+            const maxHumidity = Math.max(...dayData.map(item => item.humidity));
+            const minPressure = Math.min(...dayData.map(item => item.pressure));
+            const maxPressure = Math.max(...dayData.map(item => item.pressure));
+
+            // Check if it rained at any point during the day
+            const rained = dayData.some(item => getRainValue(item));
+
+            // Count rainy hours
+            const rainyHours = dayData.filter(item => getRainValue(item)).length;
+
+            return {
+                date: dateStr,
+                avgTemp: avgTemp,
+                avgHumidity: avgHumidity,
+                avgPressure: avgPressure,
+                minTemp: minTemp,
+                maxTemp: maxTemp,
+                minHumidity: minHumidity,
+                maxHumidity: maxHumidity,
+                minPressure: minPressure,
+                maxPressure: maxPressure,
+                rained: rained,
+                rainyHours: rainyHours,
+                totalRecords: count
+            };
+        }
+
+        function updateAnalyticsSummary(allData, dailyAverages, totalRecords) {
+            // Calculate overall averages
+            const overallAvgTemp = dailyAverages.reduce((sum, day) => sum + day.avgTemp, 0) / dailyAverages.length;
+            const overallAvgHumidity = dailyAverages.reduce((sum, day) => sum + day.avgHumidity, 0) / dailyAverages.length;
+            const overallAvgPressure = dailyAverages.reduce((sum, day) => sum + day.avgPressure, 0) / dailyAverages.length;
+
+            // Count rainy days
+            const rainyDays = dailyAverages.filter(day => day.rained).length;
+
+            // Update display
+            document.getElementById('overallAvgTemp').textContent = overallAvgTemp.toFixed(1);
+            document.getElementById('overallAvgHumidity').textContent = overallAvgHumidity.toFixed(1);
+            document.getElementById('overallAvgPressure').textContent = overallAvgPressure.toFixed(1);
+            document.getElementById('rainyDaysCount').textContent = rainyDays;
+            document.getElementById('totalRecordsCount').textContent = totalRecords;
+        }
+
+        function createTemperatureChart() {
+            const ctx = document.getElementById('temperatureChart').getContext('2d');
+
+            // Destroy existing chart if it exists
+            if (temperatureChart) {
+                temperatureChart.destroy();
+            }
+
+            const labels = dailyAverages.map(day => {
+                const date = new Date(day.date);
+                return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric'
                 });
             });
-    }
 
-    function showNoDataMessage() {
-        document.getElementById('noDataMessage').style.display = 'block';
-        document.getElementById('hourlyCardsContainer').innerHTML = '';
-        document.getElementById('dataSummary').style.display = 'none';
-    }
+            temperatureChart = new Chart(ctx, {
+                type: currentChartTypes.temperature,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Temperature (°C)',
+                        data: dailyAverages.map(day => day.avgTemp),
+                        borderColor: '#0066cc',
+                        backgroundColor: currentChartTypes.temperature === 'bar'
+                            ? 'rgba(0, 102, 204, 0.3)'
+                            : 'rgba(0, 102, 204, 0.1)',
+                        borderWidth: 2,
+                        fill: currentChartTypes.temperature === 'line',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Min Temperature (°C)',
+                        data: dailyAverages.map(day => day.minTemp),
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'transparent',
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                        fill: false
+                    },
+                    {
+                        label: 'Max Temperature (°C)',
+                        data: dailyAverages.map(day => day.maxTemp),
+                        borderColor: '#ef4444',
+                        backgroundColor: 'transparent',
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#475569',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'white',
+                            titleColor: '#1e293b',
+                            bodyColor: '#475569',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: {
+                                color: '#64748b'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                callback: function(value) {
+                                    return value + '°C';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
-    // Analytics data functions
-    async function loadAnalyticsData() {
-        const periodSelect = document.getElementById('periodSelect');
-        const days = parseInt(periodSelect.value);
+        function createHumidityChart() {
+            const ctx = document.getElementById('humidityChart').getContext('2d');
 
-        console.log(`Loading analytics data for last ${days} days`);
+            // Destroy existing chart if it exists
+            if (humidityChart) {
+                humidityChart.destroy();
+            }
 
-        // Show loading spinner
-        document.getElementById('analyticsLoading').style.display = 'block';
-        document.getElementById('analyticsSummary').style.display = 'none';
-        document.getElementById('chartsGrid').style.display = 'none';
-        document.getElementById('analyticsNoDataMessage').style.display = 'none';
+            const labels = dailyAverages.map(day => {
+                const date = new Date(day.date);
+                return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric'
+                });
+            });
 
-        try {
-            // Calculate date range
-            const endDate = new Date();
-            const startDate = new Date();
-            startDate.setDate(endDate.getDate() - days + 1);
+            humidityChart = new Chart(ctx, {
+                type: currentChartTypes.humidity,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Humidity (%)',
+                        data: dailyAverages.map(day => day.avgHumidity),
+                        borderColor: '#10b981',
+                        backgroundColor: currentChartTypes.humidity === 'bar'
+                            ? 'rgba(16, 185, 129, 0.3)'
+                            : 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2,
+                        fill: currentChartTypes.humidity === 'line',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Min Humidity (%)',
+                        data: dailyAverages.map(day => day.minHumidity),
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'transparent',
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                        fill: false
+                    },
+                    {
+                        label: 'Max Humidity (%)',
+                        data: dailyAverages.map(day => day.maxHumidity),
+                        borderColor: '#ec4899',
+                        backgroundColor: 'transparent',
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#475569',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'white',
+                            titleColor: '#1e293b',
+                            bodyColor: '#475569',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: {
+                                color: '#64748b'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
-            // Format dates for display
-            const startDateStr = startDate.toLocaleDateString('en-US', {
-                month: 'short',
+        function createPressureChart() {
+            const ctx = document.getElementById('pressureChart').getContext('2d');
+
+            // Destroy existing chart if it exists
+            if (pressureChart) {
+                pressureChart.destroy();
+            }
+
+            const labels = dailyAverages.map(day => {
+                const date = new Date(day.date);
+                return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric'
+                });
+            });
+
+            pressureChart = new Chart(ctx, {
+                type: currentChartTypes.pressure,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Pressure (hPa)',
+                        data: dailyAverages.map(day => day.avgPressure),
+                        borderColor: '#f59e0b',
+                        backgroundColor: currentChartTypes.pressure === 'bar'
+                            ? 'rgba(245, 158, 11, 0.3)'
+                            : 'rgba(245, 158, 11, 0.1)',
+                        borderWidth: 2,
+                        fill: currentChartTypes.pressure === 'line',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Min Pressure (hPa)',
+                        data: dailyAverages.map(day => day.minPressure),
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'transparent',
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                        fill: false
+                    },
+                    {
+                        label: 'Max Pressure (hPa)',
+                        data: dailyAverages.map(day => day.maxPressure),
+                        borderColor: '#ec4899',
+                        backgroundColor: 'transparent',
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#475569',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'white',
+                            titleColor: '#1e293b',
+                            bodyColor: '#475569',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: {
+                                color: '#64748b'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                callback: function(value) {
+                                    return value + ' hPa';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function toggleChartType(chartName) {
+            currentChartTypes[chartName] = currentChartTypes[chartName] === 'line' ? 'bar' : 'line';
+
+            if (chartName === 'temperature') {
+                createTemperatureChart();
+            } else if (chartName === 'humidity') {
+                createHumidityChart();
+            } else if (chartName === 'pressure') {
+                createPressureChart();
+            } else if (chartName === 'uv') {
+            }
+        }
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
                 day: 'numeric',
-                year: 'numeric'
-            });
-            const endDateStr = endDate.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-            });
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('en-US', options);
+        }
 
-            document.getElementById('analyticsDateRange').textContent =
-                `${startDateStr} - ${endDateStr}`;
+        // Initialize on page load - SINGLE DOMContentLoaded event listener
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
 
-            // Fetch data for each day
-            dailyAverages = [];
-            let allData = [];
-            let totalRecords = 0;
+            // Call the endpoint on page load
+            fetchCurrentWeatherOnLoad();
 
-            // Create array of dates to fetch
-            const datesToFetch = [];
-            const currentDate = new Date(startDate);
+            // Auto-connect to WebSocket
+            connectWebSocket();
 
-            while (currentDate <= endDate) {
-                const dateStr = currentDate.toISOString().split('T')[0];
-                datesToFetch.push(dateStr);
-                currentDate.setDate(currentDate.getDate() + 1);
+            // Initialize history date
+            const historyDateInput = document.getElementById('historyDate');
+            if (historyDateInput) {
+                // Set to 2026-01-27 as default since that's where most data is
+                historyDateInput.value = '2026-01-27';
             }
 
-            // Fetch data for all dates
-            const fetchPromises = datesToFetch.map(date =>
-                fetch(`http://localhost:8080/history?date=${date}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .catch(error => {
-                        console.warn(`No data for ${date}:`, error.message);
-                        return [];
-                    })
-            );
-
-            const allResults = await Promise.all(fetchPromises);
-
-            // Process data for each day
-            datesToFetch.forEach((dateStr, index) => {
-                const dayData = allResults[index];
-
-                if (dayData && dayData.length > 0) {
-                    // Calculate daily averages
-                    const dailyAvg = calculateDailyAverage(dayData, dateStr);
-                    dailyAverages.push(dailyAvg);
-                    allData = allData.concat(dayData);
-                    totalRecords += dayData.length;
-                }
-            });
-
-            // Sort daily averages by date
-            dailyAverages.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-            if (dailyAverages.length === 0) {
-                document.getElementById('analyticsNoDataMessage').style.display = 'block';
-                return;
-            }
-
-            // Update summary statistics
-            updateAnalyticsSummary(allData, dailyAverages, totalRecords);
-
-            // Create all charts
-            createTemperatureChart();
-            createHumidityChart();
-            createPressureChart();
-            createUVChart();
-
-            // Show all components
-            document.getElementById('analyticsSummary').style.display = 'grid';
-            document.getElementById('chartsGrid').style.display = 'grid';
-
-        } catch (error) {
-            console.error('Error loading analytics data:', error);
-            document.getElementById('analyticsNoDataMessage').style.display = 'block';
-        } finally {
-            document.getElementById('analyticsLoading').style.display = 'none';
-        }
-    }
-
-    function calculateDailyAverage(dayData, dateStr) {
-        const count = dayData.length;
-
-        // Calculate averages
-        const avgTemp = dayData.reduce((sum, item) => sum + item.temp, 0) / count;
-        const avgHumidity = dayData.reduce((sum, item) => sum + item.humidity, 0) / count;
-        const avgPressure = dayData.reduce((sum, item) => sum + item.pressure, 0) / count;
-        const avgUV = dayData.reduce((sum, item) => sum + item.uv, 0) / count;
-
-        // Get min and max values for all metrics
-        const minTemp = Math.min(...dayData.map(item => item.temp));
-        const maxTemp = Math.max(...dayData.map(item => item.temp));
-        const minHumidity = Math.min(...dayData.map(item => item.humidity));
-        const maxHumidity = Math.max(...dayData.map(item => item.humidity));
-        const minPressure = Math.min(...dayData.map(item => item.pressure));
-        const maxPressure = Math.max(...dayData.map(item => item.pressure));
-        const minUV = Math.min(...dayData.map(item => item.uv));
-        const maxUV = Math.max(...dayData.map(item => item.uv));
-
-        // Check if it rained at any point during the day
-        const rained = dayData.some(item => item.rain);
-
-        // Count rainy hours
-        const rainyHours = dayData.filter(item => item.rain).length;
-
-        return {
-            date: dateStr,
-            avgTemp: avgTemp,
-            avgHumidity: avgHumidity,
-            avgPressure: avgPressure,
-            avgUV: avgUV,
-            minTemp: minTemp,
-            maxTemp: maxTemp,
-            minHumidity: minHumidity,
-            maxHumidity: maxHumidity,
-            minPressure: minPressure,
-            maxPressure: maxPressure,
-            minUV: minUV,
-            maxUV: maxUV,
-            rained: rained,
-            rainyHours: rainyHours,
-            totalRecords: count
-        };
-    }
-
-    function updateAnalyticsSummary(allData, dailyAverages, totalRecords) {
-        // Calculate overall averages
-        const overallAvgTemp = dailyAverages.reduce((sum, day) => sum + day.avgTemp, 0) / dailyAverages.length;
-        const overallAvgHumidity = dailyAverages.reduce((sum, day) => sum + day.avgHumidity, 0) / dailyAverages.length;
-        const overallAvgPressure = dailyAverages.reduce((sum, day) => sum + day.avgPressure, 0) / dailyAverages.length;
-        const overallAvgUV = dailyAverages.reduce((sum, day) => sum + day.avgUV, 0) / dailyAverages.length;
-
-        // Count rainy days
-        const rainyDays = dailyAverages.filter(day => day.rained).length;
-
-        // Update display
-        document.getElementById('overallAvgTemp').textContent = overallAvgTemp.toFixed(1);
-        document.getElementById('overallAvgHumidity').textContent = overallAvgHumidity.toFixed(1);
-        document.getElementById('overallAvgPressure').textContent = overallAvgPressure.toFixed(1);
-        document.getElementById('overallAvgUV').textContent = overallAvgUV.toFixed(1);
-        document.getElementById('rainyDaysCount').textContent = rainyDays;
-        document.getElementById('totalRecordsCount').textContent = totalRecords;
-    }
-
-    function createTemperatureChart() {
-        const ctx = document.getElementById('temperatureChart').getContext('2d');
-
-        // Destroy existing chart if it exists
-        if (temperatureChart) {
-            temperatureChart.destroy();
-        }
-
-        const labels = dailyAverages.map(day => {
-            const date = new Date(day.date);
-            return date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric'
-            });
-        });
-
-        temperatureChart = new Chart(ctx, {
-            type: currentChartTypes.temperature,
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Average Temperature (°C)',
-                    data: dailyAverages.map(day => day.avgTemp),
-                    borderColor: '#f59e0b',
-                    backgroundColor: currentChartTypes.temperature === 'bar'
-                        ? 'rgba(245, 158, 11, 0.3)'
-                        : 'rgba(245, 158, 11, 0.1)',
-                    borderWidth: 2,
-                    fill: currentChartTypes.temperature === 'line',
-                    tension: 0.4
-                },
-                {
-                    label: 'Min Temperature (°C)',
-                    data: dailyAverages.map(day => day.minTemp),
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'transparent',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    fill: false
-                },
-                {
-                    label: 'Max Temperature (°C)',
-                    data: dailyAverages.map(day => day.maxTemp),
-                    borderColor: '#ef4444',
-                    backgroundColor: 'transparent',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: 'rgba(255, 255, 255, 0.8)',
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
-                        titleColor: 'white',
-                        bodyColor: 'white',
-                        borderColor: '#3b82f6',
-                        borderWidth: 1
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.6)'
-                        }
-                    },
-                    y: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.6)',
-                            callback: function(value) {
-                                return value + '°C';
-                            }
-                        }
-                    }
-                }
+            // Initialize Bootstrap dropdown
+            const locationDropdown = document.getElementById('locationDropdown');
+            if (locationDropdown) {
+                new bootstrap.Dropdown(locationDropdown);
             }
         });
-    }
-
-    function createHumidityChart() {
-        const ctx = document.getElementById('humidityChart').getContext('2d');
-
-        // Destroy existing chart if it exists
-        if (humidityChart) {
-            humidityChart.destroy();
-        }
-
-        const labels = dailyAverages.map(day => {
-            const date = new Date(day.date);
-            return date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric'
-            });
-        });
-
-        humidityChart = new Chart(ctx, {
-            type: currentChartTypes.humidity,
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Average Humidity (%)',
-                    data: dailyAverages.map(day => day.avgHumidity),
-                    borderColor: '#06b6d4',
-                    backgroundColor: currentChartTypes.humidity === 'bar'
-                        ? 'rgba(6, 182, 212, 0.3)'
-                        : 'rgba(6, 182, 212, 0.1)',
-                    borderWidth: 2,
-                    fill: currentChartTypes.humidity === 'line',
-                    tension: 0.4
-                },
-                {
-                    label: 'Min Humidity (%)',
-                    data: dailyAverages.map(day => day.minHumidity),
-                    borderColor: '#8b5cf6',
-                    backgroundColor: 'transparent',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    fill: false
-                },
-                {
-                    label: 'Max Humidity (%)',
-                    data: dailyAverages.map(day => day.maxHumidity),
-                    borderColor: '#ec4899',
-                    backgroundColor: 'transparent',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: 'rgba(255, 255, 255, 0.8)',
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
-                        titleColor: 'white',
-                        bodyColor: 'white',
-                        borderColor: '#3b82f6',
-                        borderWidth: 1
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.6)'
-                        }
-                    },
-                    y: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.6)',
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    function createPressureChart() {
-        const ctx = document.getElementById('pressureChart').getContext('2d');
-
-        // Destroy existing chart if it exists
-        if (pressureChart) {
-            pressureChart.destroy();
-        }
-
-        const labels = dailyAverages.map(day => {
-            const date = new Date(day.date);
-            return date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric'
-            });
-        });
-
-        pressureChart = new Chart(ctx, {
-            type: currentChartTypes.pressure,
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Average Pressure (hPa)',
-                    data: dailyAverages.map(day => day.avgPressure),
-                    borderColor: '#10b981',
-                    backgroundColor: currentChartTypes.pressure === 'bar'
-                        ? 'rgba(16, 185, 129, 0.3)'
-                        : 'rgba(16, 185, 129, 0.1)',
-                    borderWidth: 2,
-                    fill: currentChartTypes.pressure === 'line',
-                    tension: 0.4
-                },
-                {
-                    label: 'Min Pressure (hPa)',
-                    data: dailyAverages.map(day => day.minPressure),
-                    borderColor: '#8b5cf6',
-                    backgroundColor: 'transparent',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    fill: false
-                },
-                {
-                    label: 'Max Pressure (hPa)',
-                    data: dailyAverages.map(day => day.maxPressure),
-                    borderColor: '#ec4899',
-                    backgroundColor: 'transparent',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: 'rgba(255, 255, 255, 0.8)',
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
-                        titleColor: 'white',
-                        bodyColor: 'white',
-                        borderColor: '#3b82f6',
-                        borderWidth: 1
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.6)'
-                        }
-                    },
-                    y: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.6)',
-                            callback: function(value) {
-                                return value + ' hPa';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    function createUVChart() {
-        const ctx = document.getElementById('uvChart').getContext('2d');
-
-        // Destroy existing chart if it exists
-        if (uvChart) {
-            uvChart.destroy();
-        }
-
-        const labels = dailyAverages.map(day => {
-            const date = new Date(day.date);
-            return date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric'
-            });
-        });
-
-        uvChart = new Chart(ctx, {
-            type: currentChartTypes.uv,
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Average UV Index',
-                    data: dailyAverages.map(day => day.avgUV),
-                    borderColor: '#ec4899',
-                    backgroundColor: currentChartTypes.uv === 'bar'
-                        ? 'rgba(236, 72, 153, 0.3)'
-                        : 'rgba(236, 72, 153, 0.1)',
-                    borderWidth: 2,
-                    fill: currentChartTypes.uv === 'line',
-                    tension: 0.4
-                },
-                {
-                    label: 'Min UV Index',
-                    data: dailyAverages.map(day => day.minUV),
-                    borderColor: '#8b5cf6',
-                    backgroundColor: 'transparent',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    fill: false
-                },
-                {
-                    label: 'Max UV Index',
-                    data: dailyAverages.map(day => day.maxUV),
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'transparent',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: 'rgba(255, 255, 255, 0.8)',
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
-                        titleColor: 'white',
-                        bodyColor: 'white',
-                        borderColor: '#3b82f6',
-                        borderWidth: 1
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.6)'
-                        }
-                    },
-                    y: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.6)',
-                            callback: function(value) {
-                                return value.toFixed(1);
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    function toggleChartType(chartName) {
-        currentChartTypes[chartName] = currentChartTypes[chartName] === 'line' ? 'bar' : 'line';
-
-        if (chartName === 'temperature') {
-            createTemperatureChart();
-        } else if (chartName === 'humidity') {
-            createHumidityChart();
-        } else if (chartName === 'pressure') {
-            createPressureChart();
-        } else if (chartName === 'uv') {
-            createUVChart();
-        }
-    }
-
-    // Update date and time
-    function updateDateTime() {
-        const now = new Date();
-        const options = {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        };
-        document.getElementById('currentDateTime').textContent = now.toLocaleDateString('en-US', options);
-    }
-
-    // Initialize on page load - SINGLE DOMContentLoaded event listener
-    document.addEventListener('DOMContentLoaded', function() {
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
-
-        // Call the endpoint on page load
-        fetchCurrentWeatherOnLoad();
-
-        // Auto-connect to WebSocket
-        connectWebSocket();
-
-        // Initialize history date
-        const historyDateInput = document.getElementById('historyDate');
-        if (historyDateInput) {
-            // Set to 2026-01-27 as default since that's where most data is
-            historyDateInput.value = '2026-01-27';
-        }
-
-        // Initialize Bootstrap dropdown
-        const locationDropdown = document.getElementById('locationDropdown');
-        if (locationDropdown) {
-            new bootstrap.Dropdown(locationDropdown);
-        }
-    });
-</script>
+    </script>
 </body>
 </html>

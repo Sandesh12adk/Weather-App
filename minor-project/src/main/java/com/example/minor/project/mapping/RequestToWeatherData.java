@@ -20,7 +20,7 @@ public class RequestToWeatherData {
         WeatherData weatherData= new WeatherData();
         weatherData.setUv(requestWeatherData.getUv());
         weatherData.setHumidity(requestWeatherData.getHumidity());
-        weatherData.setRain(requestWeatherData.isRain());
+        weatherData.setRain(requestWeatherData.getIsRain());
         weatherData.setTemp(requestWeatherData.getTemp());
         weatherData.setPressure(requestWeatherData.getPressure());
         Location location= locationService.findLocationByName(location1);

@@ -5,6 +5,7 @@ import com.example.minor.project.dto.WeatherDataResponse;
 import com.example.minor.project.model.WeatherData;
 import com.example.minor.project.service.WeatherRedisService;
 import com.example.minor.project.service.WeatherService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ public class WeatherController {
         this.weatherService= weatherService;
     }
     @PostMapping("/weather-data")
-    public ResponseEntity<?> setData(@RequestBody RequestWeatherData requestWeatherData){
+    public ResponseEntity<?> setData( @Valid @RequestBody RequestWeatherData requestWeatherData){
       weatherRedisService.save(requestWeatherData);
         messagingTemplate.convertAndSend("/topic",requestWeatherData);
         return ResponseEntity.status(HttpStatus.OK).build();

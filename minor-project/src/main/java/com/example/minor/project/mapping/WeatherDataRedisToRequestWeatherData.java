@@ -11,7 +11,7 @@ public class WeatherDataRedisToRequestWeatherData {
         RequestWeatherData requestWeatherData= new  RequestWeatherData();
         requestWeatherData.setUv(weatherDataRedis.getUv());
         requestWeatherData.setTemp(weatherDataRedis.getTemp());
-        requestWeatherData.setRain(weatherDataRedis.isRain());
+        requestWeatherData.setIsRain(weatherDataRedis.isRain());
         requestWeatherData.setPressure(weatherDataRedis.getPressure());
         requestWeatherData.setHumidity(weatherDataRedis.getHumidity());
         return requestWeatherData;

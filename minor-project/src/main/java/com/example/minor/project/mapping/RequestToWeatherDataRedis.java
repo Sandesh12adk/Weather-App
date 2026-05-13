@@ -14,7 +14,7 @@ public class RequestToWeatherDataRedis {
        // weatherDataRedis.setId(LocalTime.now().toString());
         weatherDataRedis.setId(String.valueOf(System.currentTimeMillis()));
         weatherDataRedis.setUv(requestWeatherData.getUv());
-        weatherDataRedis.setRain(requestWeatherData.isRain());
+        weatherDataRedis.setRain(requestWeatherData.getIsRain());
         weatherDataRedis.setHumidity(requestWeatherData.getHumidity());
         weatherDataRedis.setTemp(requestWeatherData.getTemp());
         weatherDataRedis.setPressure(requestWeatherData.getPressure());
